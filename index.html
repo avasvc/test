@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<div>test</div>
+<script type = 'text/template' id ='template'>
+Имя <%=name%>, возраст <%=age%>, цвет <%=color%>
+</script>
+<script type = 'text/javascript' src ='jquery-1.10.2.js'></script>
+<script type = 'text/javascript' src ='underscore.js'></script>
+<script type = 'text/javascript' src ='backbone.js'></script>
+<script type = 'text/javascript'>
+	var ls =[
+		{'name':'Артем','age':39,color:'green'},
+		{'name':'Vasya','age':3,color:'red'},
+		{'name':'Petya','age':22,color:'blue'},
+		{'name':'Fedor','age':12,color:'grey'}
+		];
+(function(){
+	window.App = {
+		Models:{},
+		Views:{},
+		Collections:{}
+	};
+	App.Models.Person = Backbone.Model.extend({
+		defaults:{
+			name:'Артем',
+			age:39,
+			color:'green'
+		}
+	});
+	var person = new App.Models.Person();
+
+	App.Collections.Persons = Backbone.Collection.extend({
+		model:App.Models.Person
+	});
+	var listCollects = new App.Collections.Persons(ls);
+/*
+	var listCollects = new Backbone.Collection(ls,{
+		model:App.Models.Person
+	});
+*/	
+	App.Views.Li = Backbone.View.extend({
+		initialize: function(){
+			this.render();
+		},
+		tagName:'li',
+		template:template('template'),
+		render:function(){
+			this.$el.html(this.template(this.model.toJSON()));
+		}
+	});
+	function template(id){
+		return _.template($('#'+id).html());
+	}
+
+	App.Views.Ul = Backbone.View.extend({
+		tagName:'ul',
+		initialize: function(){
+			this.render();
+		},
+		render:function(){
+			this.collection.each(function(person){
+				var listView = new App.Views.Li({
+					model:person			
+				});
+				this.$el.append(listView.el);
+			},this);
+			$('body').append(this.$el);
+		}	
+	});
+	var ulView = new App.Views.Ul({
+		collection:listCollects
+	});
+
+})();
+
+
+	
+	
+	
+	
+</script>
+
+</body>
+</html>
